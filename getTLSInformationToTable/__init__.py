@@ -1,7 +1,7 @@
 import ssl
 import sys
 import socket
-from pprint import pprint as print
+from pprint import pprint
 from datetime import datetime
 from urllib.parse import urlparse
 
@@ -36,12 +36,12 @@ def get_tls_validity(url):
 
 def main():
     url = sys.argv[1]
-    print(f"Checking TLS information for {url}")
+    pprint(f"Checking TLS information for {url}")
     ssl_info = get_tls_validity(url)
     if ssl_info:
-        print(ssl_info)
+        pprint(ssl_info)
     else:
-        print("No TLS information found")
+        pprint("No TLS information found")
 
 
 if __name__ == "__main__":
