@@ -1,6 +1,7 @@
 import ssl
 import sys
 import socket
+from pprint import pprint as print
 from datetime import datetime
 from urllib.parse import urlparse
 
@@ -15,21 +16,28 @@ def try_except(func):
 
 
 @try_except
-def check_tls_validity(url):
+def get_tls_validity(url):
     hostname = urlparse(url).hostname
     context = ssl.create_default_context()
     conn = context.wrap_socket(socket.socket(socket.AF_INET), server_hostname=hostname)
     conn.connect((hostname, 443))
     ssl_info = conn.getpeercert()
     conn.close()
-    return ssl_info
+    if not ssl_info:
+        return None
+    ssl_info_dict = {
+        "subject": ssl_info["subject"],
+        "notBefore": ssl_info["notBefore"],
+        "notAfter": ssl_info["notAfter"],
+    }
+    return ssl_info_dict
 
 
 
 def main():
     url = sys.argv[1]
     print(f"Checking TLS information for {url}")
-    ssl_info = check_tls_validity(url)
+    ssl_info = get_tls_validity(url)
     if ssl_info:
         print(ssl_info)
     else:
