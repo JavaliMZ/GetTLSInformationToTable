@@ -32,6 +32,7 @@ def get_date(string):
     formatted_date = date_object.strftime("%d%b%Y").upper()
     return formatted_date
 
+@try_except
 def execute_tls_scan(host):
     command = f"$HOME/go/bin/check-tls-cert net -H {host}"
     output, error = get_system_command(command)
