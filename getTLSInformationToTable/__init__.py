@@ -33,12 +33,14 @@ def get_date(string):
 
 @try_except
 def get_all_data(data):
+    parsed_data = []
     json_data = json.loads(data)
     host = json_data["host"]
     port = json_data["port"]
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
+    parsed_data.append([host, port, ip, not_before, not_after])
     ciphers = json_data["cipher_enum"]
     cipher_problem = []
     for cipher in ciphers:
@@ -47,29 +49,16 @@ def get_all_data(data):
         has_weak_cipher = "weak" in cipher["ciphers"].keys()
         has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
         if has_insecure_cipher:
-            tmp = ""
             for c in cipher['ciphers']['insecure']:
-                tmp += c + '\n'
-            cipher_problem.append(f"{version} - insecure - {tmp}")
+                parsed_data.append([host, port, ip, not_before, not_after, version, "insecure", c])
         if has_weak_cipher:
-            tmp = ""
             for c in cipher['ciphers']['weak']:
-                tmp += c + '\n'
-            cipher_problem.append(f"{version} - weak - {tmp}")
+                parsed_data.append([host, port, ip, not_before, not_after, version, "weak", c])
         if has_unknown_cipher:
-            tmp = ""
             for c in cipher['ciphers']['unknown']:
-                tmp += c + '\n'
-            cipher_problem.append(f"{version} - unknown - {tmp}")
+                parsed_data.append([host, port, ip, not_before, not_after, version, "unknown", c])
     
-    return [
-        host,
-        ip,
-        port,
-        not_before,
-        not_after,
-        cipher_problem
-    ]
+    return parsed_data
 
 @try_except
 def print_table(all_data):
