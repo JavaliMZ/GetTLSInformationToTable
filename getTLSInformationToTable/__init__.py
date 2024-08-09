@@ -32,6 +32,15 @@ def get_date(string):
     formatted_date = date_object.strftime("%d%b%Y").upper()
     return formatted_date
 
+def execute_tls_scan(host):
+    command = f"$HOME/go/bin/check-tls-cert net -H {host}"
+    output, error = get_system_command(command)
+    if error:
+        print(f"Error when execute command: {command}")
+        print(f"Error: {error}")
+        sys.exit(1)
+    return output
+
 @try_except
 def get_all_data(data):
     parsed_data = []
@@ -41,7 +50,7 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, "", "", ""])
+    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, "", "", execute_tls_scan(host)])
     ciphers = json_data["cipher_enum"]
     for cipher in ciphers:
         version = cipher["version"]
