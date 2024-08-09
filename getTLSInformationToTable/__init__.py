@@ -47,11 +47,20 @@ def get_all_data(data):
         has_weak_cipher = "weak" in cipher["ciphers"].keys()
         has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
         if has_insecure_cipher:
-            cipher_problem.append(f"{version} - insecure - {''.join([c + '\\n' for c in cipher['ciphers']['insecure']])}")
+            tmp = ""
+            for c in cipher['ciphers']['insecure']:
+                tmp += c + '\n'
+            cipher_problem.append(f"{version} - insecure - {tmp}")
         if has_weak_cipher:
-            cipher_problem.append(f"{version} - weak - {''.join([c + '\\n' for c in cipher['ciphers']['weak']])}")
+            tmp = ""
+            for c in cipher['ciphers']['weak']:
+                tmp += c + '\n'
+            cipher_problem.append(f"{version} - weak - {tmp}")
         if has_unknown_cipher:
-            cipher_problem.append(f"{version} - unknown - {''.join([c + '\\n' for c in cipher['ciphers']['unknown']])}")
+            tmp = ""
+            for c in cipher['ciphers']['unknown']:
+                tmp += c + '\n'
+            cipher_problem.append(f"{version} - unknown - {tmp}")
     
     return [
         host,
