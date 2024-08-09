@@ -78,7 +78,7 @@ def main():
         for data in json_file:
             all_data.append(get_all_data(data))
     
-    print_table(all_data)
+    print(all_data)
 
 
 
