@@ -66,7 +66,7 @@ def print_table(all_data):
     print(tabulate(table, tablefmt='plain', numalign="left"))
 
 def check_for_tslx_installed():
-    command = "tlsx --version"
+    command = "which tlsx"
     output, error = get_system_command(command)
     if error:
         print("tlsx is not installed")
