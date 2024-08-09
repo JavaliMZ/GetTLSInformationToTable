@@ -72,7 +72,7 @@ def get_all_data(data):
 @try_except
 def print_table(all_data):
     table = [line for data in all_data for line in data]
-    print(tabulate(table, tablefmt='pipe', numalign="left"))
+    print(tabulate(table, tablefmt='presto', numalign="left"))
 
 
 @try_except
