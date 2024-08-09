@@ -40,9 +40,8 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([host, port, ip, not_before, not_after])
+    parsed_data.append([host, port, ip, not_before, not_after, "", "", ""])
     ciphers = json_data["cipher_enum"]
-    cipher_problem = []
     for cipher in ciphers:
         version = cipher["version"]
         has_insecure_cipher = "insecure" in cipher["ciphers"].keys()
