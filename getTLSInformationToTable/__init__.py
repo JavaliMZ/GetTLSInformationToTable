@@ -49,7 +49,7 @@ def get_system_command(command):
 
 def main():
     list_of_urls_file = sys.argv[1]
-    command = f"tlsx -l {list_of_urls_file} -ex -ss -mm -re -un -ve -ce -ct all -o /tmp/{list_of_urls_file}.result.tlsx.output"
+    command = f"tlsx -l {list_of_urls_file} -j -ex -ss -mm -re -un -ve -ce -ct all -o /tmp/{list_of_urls_file}.result.tlsx.output"
     output, error = get_system_command(command)
     pprint(output)
     pprint(error)
