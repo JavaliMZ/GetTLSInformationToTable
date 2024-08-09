@@ -41,7 +41,7 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([colored(host, "green"), colored(port, "magenta"), colored(ip, "red"), not_before, not_after, "", "", ""])
+    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, "", "", ""])
     ciphers = json_data["cipher_enum"]
     for cipher in ciphers:
         version = cipher["version"]
@@ -50,13 +50,13 @@ def get_all_data(data):
         has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
         if has_insecure_cipher:
             for c in cipher['ciphers']['insecure']:
-                parsed_data.append([colored(host, "green"), colored(port, "magenta"), colored(ip, "red"), not_before, not_after, version, "insecure", colored(c, "yellow")])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, version, "insecure", colored(c, "yellow")])
         if has_weak_cipher:
             for c in cipher['ciphers']['weak']:
-                parsed_data.append([colored(host, "green"), colored(port, "magenta"), colored(ip, "red"), not_before, not_after, version, "weak", colored(c, "yellow")])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, version, "weak", colored(c, "yellow")])
         if has_unknown_cipher:
             for c in cipher['ciphers']['unknown']:
-                parsed_data.append([colored(host, "green"), colored(port, "magenta"), colored(ip, "red"), not_before, not_after, version, "unknown", colored(c, "yellow")])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, version, "unknown", colored(c, "yellow")])
     
     return parsed_data
 
