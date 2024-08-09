@@ -39,7 +39,7 @@ def execute_tls_scan(host):
         print(f"Error when execute command: {command}")
         print(f"Error: {error}")
         sys.exit(1)
-    return output
+    return output.decode()
 
 @try_except
 def get_all_data(data):
