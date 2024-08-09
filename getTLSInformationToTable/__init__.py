@@ -28,7 +28,7 @@ def get_system_command(command):
 @try_except
 def get_date(string):
     date_object = datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ")
-    formatted_date = date_object.strftime("%d%b%Y UTC").upper()
+    formatted_date = date_object.strftime("%d%b%Y").upper()
     return formatted_date
 
 @try_except
