@@ -25,6 +25,7 @@ def get_system_command(command):
     output, error = process.communicate()
     return output, error
 
+@try_except
 def get_date(string):
     date_object = datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ")
     formatted_date = date_object.strftime("%d%b%Y UTC").upper()
@@ -61,28 +62,22 @@ def get_all_data(data):
         cipher_problem
     ]
 
+@try_except
 def print_table(all_data):
     table = [line for line in all_data]
     print(tabulate(table, tablefmt='plain', numalign="left"))
 
-def check_for_tslx_installed():
-    command = "which tlsx"
-    output, error = get_system_command(command)
-    if error:
-        print("tlsx is not installed")
-        sys.exit(1)
-    print("tlsx is installed")
-
 
 @try_except
 def main():
-    check_for_tslx_installed()
-    list_of_urls_file = sys.argv[1]
-    output_path = f"/tmp/{list_of_urls_file}.result.tlsx.output"
-    command = f"tlsx -l {list_of_urls_file} -j -ex -ss -mm -re -un -ve -ce -ct all -o {output_path}"
-    output, error = get_system_command(command)
+    if sys.argv[1] == "-h":
+        print("tlsx -l domains.txt -j -ex -ss -mm -re -un -ve -ce -ct all -o result.json\n\n")
+        print("run this command to get the result in table format")
+        print("getTLSInformationToTable result.json")
+        sys.exit(0)
+    json_file_path = sys.argv[1]
     all_data = []
-    with open(output_path) as json_file:
+    with open(json_file_path) as json_file:
         for data in json_file:
             all_data.append(get_all_data(data))
     
