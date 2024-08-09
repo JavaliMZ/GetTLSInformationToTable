@@ -1,11 +1,8 @@
-import ssl
-import sys
-import socket
 import json
+import sys
 import subprocess
-from pprint import pprint
+from tabulate import tabulate  # type: ignore
 from datetime import datetime
-from urllib.parse import urlparse
 
 
 # Basic Command:
@@ -18,28 +15,9 @@ def try_except(func):
         except Exception as e:
             print(f"Error when run this function: {func.__name__}")
             print(f"Error: {e}")
+            sys.exit(1)
     return wrapper
 
-def read_json_file(file):
-    content = open(file, "r").read()
-    return json.loads(content)
-
-@try_except
-def get_tls_validity(url):
-    hostname = urlparse(url).hostname
-    context = ssl.create_default_context()
-    conn = context.wrap_socket(socket.socket(socket.AF_INET), server_hostname=hostname)
-    conn.connect((hostname, 443))
-    ssl_info = conn.getpeercert()
-    conn.close()
-    if not ssl_info:
-        return None
-    ssl_info_dict = {
-        "subject": ssl_info["subject"],
-        "notBefore": ssl_info["notBefore"],
-        "notAfter": ssl_info["notAfter"],
-    }
-    return ssl_info_dict
 
 @try_except
 def get_system_command(command):
@@ -47,12 +25,69 @@ def get_system_command(command):
     output, error = process.communicate()
     return output, error
 
-def main():
-    list_of_urls_file = sys.argv[1]
-    command = f"tlsx -l {list_of_urls_file} -j -ex -ss -mm -re -un -ve -ce -ct all -o /tmp/{list_of_urls_file}.result.tlsx.output"
+def get_date(string):
+    date_object = datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ")
+    formatted_date = date_object.strftime("%d%b%Y UTC").upper()
+    return formatted_date
+
+@try_except
+def get_all_data(data):
+    json_data = json.loads(data)
+    host = json_data["host"]
+    port = json_data["port"]
+    ip = json_data["ip"]
+    not_before = get_date(json_data["not_before"])
+    not_after = get_date(json_data["not_after"])
+    ciphers = json_data["cipher_enum"]
+    cipher_problem = []
+    for cipher in ciphers:
+        version = cipher["version"]
+        has_insecure_cipher = "insecure" in cipher["ciphers"].keys()
+        has_weak_cipher = "weak" in cipher["ciphers"].keys()
+        has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
+        if has_insecure_cipher:
+            cipher_problem.append([version, "insecure", cipher["ciphers"]["insecure"]])
+        if has_weak_cipher:
+            cipher_problem.append([version, "weak", cipher["ciphers"]["weak"]])
+        if has_unknown_cipher:
+            cipher_problem.append([version, "unknown", cipher["ciphers"]["unknown"]])
+    
+    return [
+        host,
+        ip,
+        port,
+        not_before,
+        not_after,
+        cipher_problem
+    ]
+
+def print_table(all_data):
+    table = [line for line in all_data]
+    print(tabulate(table, tablefmt='plain', numalign="left"))
+
+def check_for_tslx_installed():
+    command = "tlsx --version"
     output, error = get_system_command(command)
-    pprint(output)
-    pprint(error)
+    if error:
+        print("tlsx is not installed")
+        sys.exit(1)
+    print("tlsx is installed")
+
+
+@try_except
+def main():
+    check_for_tslx_installed()
+    list_of_urls_file = sys.argv[1]
+    output_path = f"/tmp/{list_of_urls_file}.result.tlsx.output"
+    command = f"tlsx -l {list_of_urls_file} -j -ex -ss -mm -re -un -ve -ce -ct all -o {output_path}"
+    output, error = get_system_command(command)
+    all_data = []
+    with open(output_path) as json_file:
+        for data in json_file:
+            all_data.append(get_all_data(data))
+    
+    print_table(all_data)
+
 
 
 
