@@ -61,7 +61,7 @@ def get_all_data(data):
 
 @try_except
 def print_table(all_data):
-    table = [line for line in all_data]
+    table = [line for line in all_data[0]]
     print(tabulate(table, tablefmt='plain', numalign="left"))
 
 
@@ -78,7 +78,7 @@ def main():
         for data in json_file:
             all_data.append(get_all_data(data))
     
-    print(all_data)
+    print_table(all_data)
 
 
 
