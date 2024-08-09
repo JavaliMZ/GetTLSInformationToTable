@@ -61,7 +61,7 @@ def get_all_data(data):
 
 @try_except
 def print_table(all_data):
-    table = [line for line in all_data[0]]
+    table = [line for data in all_data for line in data]
     print(tabulate(table, tablefmt='plain', numalign="left"))
 
 
