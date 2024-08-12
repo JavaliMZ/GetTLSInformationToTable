@@ -60,13 +60,13 @@ def get_all_data(data):
         has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
         if has_insecure_cipher:
             for c in cipher['ciphers']['insecure']:
-                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, f"{version} - insecure {colored(c, 'yellow')}"])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), port, not_before, colored(not_after, "cyan"), f"{version} - insecure {colored(c, 'yellow')}"])
         if has_weak_cipher:
             for c in cipher['ciphers']['weak']:
-                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, f"{version} - weak {colored(c, 'yellow')}"])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), port, not_before, colored(not_after, "cyan"), f"{version} - weak {colored(c, 'yellow')}"])
         if has_unknown_cipher:
             for c in cipher['ciphers']['unknown']:
-                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, f"{version} - unknown {colored(c, 'yellow')}"])
+                parsed_data.append([colored(host, "green"), colored(ip, "magenta"), port, not_before, colored(not_after, "cyan"), f"{version} - unknown {colored(c, 'yellow')}"])
     
     return parsed_data
 
