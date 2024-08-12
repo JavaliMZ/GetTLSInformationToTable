@@ -51,7 +51,14 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), port, not_before, colored(not_after, "cyan"), colored(execute_tls_scan(host), "yellow")])
+    parsed_data.append([
+        colored(host, "green"), 
+        colored(ip, "magenta"), 
+        port, 
+        not_before, 
+        colored(not_after, "cyan"), 
+        execute_tls_scan(host)
+        ])
     ciphers = json_data["cipher_enum"]
     for cipher in ciphers:
         version = cipher["version"]
@@ -66,7 +73,8 @@ def get_all_data(data):
                     port, 
                     not_before, 
                     colored(not_after, "cyan"), 
-                    f"{version} - {colored('insecure', 'red')} {colored(c, 'yellow')}"])
+                    f"{version} - {colored('insecure', 'red')} {colored(c, 'yellow')}"
+                    ])
         if has_weak_cipher:
             for c in cipher['ciphers']['weak']:
                 parsed_data.append([
@@ -75,7 +83,8 @@ def get_all_data(data):
                     port, 
                     not_before, 
                     colored(not_after, "cyan"), 
-                    f"{version} - {colored('weak', 'red')} {colored(c, 'yellow')}"])
+                    f"{version} - {colored('weak', 'red')} {colored(c, 'yellow')}"
+                    ])
         if has_unknown_cipher:
             for c in cipher['ciphers']['unknown']:
                 parsed_data.append([
@@ -84,7 +93,8 @@ def get_all_data(data):
                     port, 
                     not_before, 
                     colored(not_after, "cyan"), 
-                    f"{version} - {colored('unknown', 'magenta')} {colored(c, 'yellow')}"])
+                    f"{version} - {colored('unknown', 'magenta')} {colored(c, 'yellow')}"
+                    ])
     
     return parsed_data
 
