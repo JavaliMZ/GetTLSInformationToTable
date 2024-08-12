@@ -51,7 +51,7 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, execute_tls_scan(host)])
+    parsed_data.append([colored(host, "green"), colored(ip, "magenta"), port, not_before, colored(not_after, "cyan"), execute_tls_scan(host)])
     ciphers = json_data["cipher_enum"]
     for cipher in ciphers:
         version = cipher["version"]
