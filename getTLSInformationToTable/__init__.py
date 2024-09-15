@@ -107,9 +107,10 @@ def print_table(all_data):
 @try_except
 def main():
     if sys.argv[1] == "-h":
-        print("tlsx -l domains.txt -j -ex -ss -mm -re -un -ve -ce -ct all -o result.json\n\n")
+        print("Prepare a single json file:")
+        print("[+] tlsx -l domains.txt -j -ex -ss -mm -re -un -ve -ce -ct all -o result.json\n\n")
         print("run this command to get the result in table format")
-        print("getTLSInformationToTable result.json")
+        print("[+] getTLSInformationToTable result.json")
         sys.exit(0)
     json_file_path = sys.argv[1]
     all_data = []
