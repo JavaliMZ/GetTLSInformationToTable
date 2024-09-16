@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='getTLSInformationToTable',
-    version='1.0.0',
+    version='1.0.1',
     description='Private package to getTLSInformationToTable, a tool to convert Nmap and Censys scans to a table',
     url='git@github.com:JavaliMZ/getTLSInformationToTable.git',
     author='Sylvain Júlio',
@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'tabulate',  # Ensures that the tabulate library is installed
         'termcolor'  # Ensures that the termcolor library is installed
+        'pwntools'  # Ensures that the pwntools library is installed
     ],
     entry_points={
         'console_scripts': [

@@ -4,6 +4,7 @@ import subprocess
 from tabulate import tabulate  # type: ignore
 from datetime import datetime
 from termcolor import colored  # type: ignore
+from pwn import log
 
 # Basic Command:
 # tlsx -u https://www.google.com -ex -ss -mm -re -un -ve -ce -ct all -o /tmp/tlsx_output.csv
@@ -53,7 +54,7 @@ def get_length_insecure_and_weak_cipher(cipher_list):
 
 
 @try_except
-def get_all_data(data):
+def get_all_data(data, log_info):
     parsed_data = []
     json_data = json.loads(data)
     host = json_data["host"]
@@ -63,6 +64,7 @@ def get_all_data(data):
     not_after = get_date(json_data["not_after"])
     ciphers = json_data["cipher_enum"]
     length_insecure_and_weak_cipher = get_length_insecure_and_weak_cipher(ciphers)
+    log_info.status(f"Get data from {host}:{port}")
     res_tls_scan = execute_tls_scan(host)
     if length_insecure_and_weak_cipher == 0:
             parsed_data.append([
@@ -132,6 +134,7 @@ def print_table(all_data):
 
 @try_except
 def main():
+    log_info = log.progress("Get all data")
     if sys.argv[1] == "-h":
         print("Prepare a single json file:")
         print("[+] tlsx -l domains.txt -j -ex -ss -mm -re -un -ve -ce -ct all -o result.json\n\n")
@@ -142,7 +145,7 @@ def main():
     all_data = []
     with open(json_file_path) as json_file:
         for data in json_file:
-            all_data.append(get_all_data(data))
+            all_data.append(get_all_data(data, log_info))
     
     print_table(all_data)
 
