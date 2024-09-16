@@ -35,7 +35,7 @@ def get_date(string):
 def execute_tls_scan(host):
     command = f"$HOME/go/bin/check-tls-cert net -H {host}"
     output, error = get_system_command(command)
-    # return "OK"
+    return "OK"
     if error:
         print(f"Error when execute command: {command}")
         print(f"Error: {error}")
@@ -64,6 +64,7 @@ def get_all_data(data):
     not_after = get_date(json_data["not_after"])
     ciphers = json_data["cipher_enum"]
     length_insecure_and_weak_cipher = get_length_insecure_and_weak_cipher(ciphers)
+    res_tls_scan = execute_tls_scan(host)
     if length_insecure_and_weak_cipher == 0:
             parsed_data.append([
                 colored(host, "green"), 
@@ -71,7 +72,19 @@ def get_all_data(data):
                 port, 
                 not_before, 
                 colored(not_after, "cyan"), 
-                execute_tls_scan(host)
+                    res_tls_scan
+
+            ])
+    else:
+        if not "OK" in res_tls_scan:
+            parsed_data.append([
+                colored(host, "green"), 
+                colored(ip, "magenta"), 
+                port, 
+                not_before, 
+                colored(not_after, "cyan"), 
+                res_tls_scan
+
             ])
     if length_insecure_and_weak_cipher > int(sys.argv[2]):
         parsed_data.append([
