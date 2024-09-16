@@ -12,7 +12,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'tabulate',  # Ensures that the tabulate library is installed
-        'termcolor'  # Ensures that the termcolor library is installed
+        'termcolor',  # Ensures that the termcolor library is installed
         'pwntools'  # Ensures that the pwntools library is installed
     ],
     entry_points={
