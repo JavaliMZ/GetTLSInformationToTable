@@ -5,7 +5,6 @@ from tabulate import tabulate  # type: ignore
 from datetime import datetime
 from termcolor import colored  # type: ignore
 
-
 # Basic Command:
 # tlsx -u https://www.google.com -ex -ss -mm -re -un -ve -ce -ct all -o /tmp/tlsx_output.csv
 
@@ -36,11 +35,23 @@ def get_date(string):
 def execute_tls_scan(host):
     command = f"$HOME/go/bin/check-tls-cert net -H {host}"
     output, error = get_system_command(command)
+    # return "OK"
     if error:
         print(f"Error when execute command: {command}")
         print(f"Error: {error}")
         sys.exit(1)
     return output.decode()
+
+@try_except
+def get_length_insecure_and_weak_cipher(cipher_list):
+    length = 0
+    for cipher in cipher_list:
+        if "insecure" in cipher["ciphers"].keys():
+            length += len(cipher["ciphers"]["insecure"])
+        if "weak" in cipher["ciphers"].keys():
+            length += len(cipher["ciphers"]["weak"])
+    return length
+
 
 @try_except
 def get_all_data(data):
@@ -51,20 +62,33 @@ def get_all_data(data):
     ip = json_data["ip"]
     not_before = get_date(json_data["not_before"])
     not_after = get_date(json_data["not_after"])
-    parsed_data.append([
-        colored(host, "green"), 
-        colored(ip, "magenta"), 
-        port, 
-        not_before, 
-        colored(not_after, "cyan"), 
-        execute_tls_scan(host)
-        ])
     ciphers = json_data["cipher_enum"]
+    length_insecure_and_weak_cipher = get_length_insecure_and_weak_cipher(ciphers)
+    if length_insecure_and_weak_cipher == 0:
+            parsed_data.append([
+                colored(host, "green"), 
+                colored(ip, "magenta"), 
+                port, 
+                not_before, 
+                colored(not_after, "cyan"), 
+                execute_tls_scan(host)
+            ])
+    if length_insecure_and_weak_cipher > int(sys.argv[2]):
+        parsed_data.append([
+            colored(host, "green"), 
+            colored(ip, "magenta"), 
+            port, 
+            not_before, 
+            colored(not_after, "cyan"), 
+            f"{colored('To many insecure or weak ciphers available', 'red')}"
+            ])
+        return parsed_data
+    
     for cipher in ciphers:
         version = cipher["version"]
         has_insecure_cipher = "insecure" in cipher["ciphers"].keys()
         has_weak_cipher = "weak" in cipher["ciphers"].keys()
-        has_unknown_cipher = "unknown" in cipher["ciphers"].keys()
+
         if has_insecure_cipher:
             for c in cipher['ciphers']['insecure']:
                 parsed_data.append([
@@ -85,16 +109,6 @@ def get_all_data(data):
                     colored(not_after, "cyan"), 
                     f"{version} - {colored('weak', 'red')} {colored(c, 'yellow')}"
                     ])
-        if has_unknown_cipher:
-            for c in cipher['ciphers']['unknown']:
-                parsed_data.append([
-                    colored(host, "green"), 
-                    colored(ip, "magenta"), 
-                    port, 
-                    not_before, 
-                    colored(not_after, "cyan"), 
-                    f"{version} - {colored('unknown', 'magenta')} {colored(c, 'yellow')}"
-                    ])
     
     return parsed_data
 
@@ -110,7 +124,7 @@ def main():
         print("Prepare a single json file:")
         print("[+] tlsx -l domains.txt -j -ex -ss -mm -re -un -ve -ce -ct all -o result.json\n\n")
         print("run this command to get the result in table format")
-        print("[+] getTLSInformationToTable result.json")
+        print("[+] getTLSInformationToTable result.json <length of insecure and weak ciphers>")
         sys.exit(0)
     json_file_path = sys.argv[1]
     all_data = []
