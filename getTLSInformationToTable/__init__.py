@@ -35,7 +35,6 @@ def get_date(string):
 def execute_tls_scan(host):
     command = f"$HOME/go/bin/check-tls-cert net -H {host}"
     output, error = get_system_command(command)
-    return "OK"
     if error:
         print(f"Error when execute command: {command}")
         print(f"Error: {error}")
