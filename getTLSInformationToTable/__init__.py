@@ -33,7 +33,7 @@ def execute_tls_scan(host):
     command = f"$HOME/go/bin/check-tls-cert net -H {host}"
     output, error = get_system_command(command)
     if error:
-        print(f"Error executing command: {command}")
+        log.error(f"Error executing command: {command}")
         print(f"Error: {error}")
         sys.exit(1)
     return output.decode()
@@ -42,33 +42,33 @@ def execute_tls_scan(host):
 def count_insecure_weak_ciphers(cipher_list):
     return sum(len(cipher["ciphers"].get("insecure", [])) + len(cipher["ciphers"].get("weak", [])) for cipher in cipher_list)
 
-def parse_ciphers(host, ip, port, not_before, not_after, ciphers):
+@try_except
+def parse_line_info(parsed_data, tls_data_host, description):
+    parsed_data.append([
+        colored(tls_data_host["host"], "green"), 
+        colored(tls_data_host["ip"], "magenta"), 
+        tls_data_host["port"], 
+        tls_data_host["not_before"], 
+        colored(tls_data_host["not_after"], "cyan"), 
+        description
+    ])
+
+@try_except
+def parse_single_cipher(parsed_data, tls_data_host, version, cipher_type, cipher_list):
+    for c in cipher_list:
+        description = f"{version} - {colored(cipher_type, 'red')} {colored(c, 'yellow')}"
+        parse_line_info(parsed_data, tls_data_host, description)
+
+
+@try_except
+def parse_ciphers(tls_data_host, ciphers):
     parsed_data = []
     for cipher in ciphers:
         version = cipher["version"]
         for cipher_type in ["insecure", "weak"]:
             if cipher_type in cipher["ciphers"]:
-                for c in cipher["ciphers"][cipher_type]:
-                    parsed_data.append([
-                        colored(host, "green"), 
-                        colored(ip, "magenta"), 
-                        port, 
-                        not_before, 
-                        colored(not_after, "cyan"), 
-                        f"{version} - {colored(cipher_type, 'red')} {colored(c, 'yellow')}"
-                    ])
+                parse_single_cipher(parsed_data, tls_data_host, version, cipher_type, cipher["ciphers"][cipher_type])
     return parsed_data
-
-@try_except
-def parse_line_info(parsed_data, host, ip, port, not_before, not_after, description):
-    parsed_data.append([
-        colored(host, "green"), 
-        colored(ip, "magenta"), 
-        port, 
-        not_before, 
-        colored(not_after, "cyan"), 
-        description
-    ])
 
 @try_except
 def parse_tls_data(data, log_info):
@@ -81,18 +81,25 @@ def parse_tls_data(data, log_info):
 
     insecure_weak_cipher_count = count_insecure_weak_ciphers(ciphers)
     description = execute_tls_scan(host)
+    tls_data_host = {
+        "host": host,
+        "port": port,
+        "ip": ip,
+        "not_before": not_before,
+        "not_after": not_after
+    }
 
     parsed_data = []
     if insecure_weak_cipher_count == 0 or "OK" not in description:
         description = description.replace("OK", colored("OK", "green"))
         description = description.replace("CRITICAL", colored("CRITICAL", "yellow"))
-        parse_line_info(parsed_data, host, ip, port, not_before, not_after, description)
+        parse_line_info(parsed_data, tls_data_host, description)
 
     if insecure_weak_cipher_count > int(sys.argv[2]):
         description = colored('Too many insecure or weak ciphers available', "red")
-        parse_line_info(parsed_data, host, ip, port, not_before, not_after, description)
+        parse_line_info(parsed_data, tls_data_host, description)
     else:
-        parsed_data.extend(parse_ciphers(host, ip, port, not_before, not_after, ciphers))
+        parsed_data.extend(parse_ciphers(tls_data_host, ciphers))
 
     return parsed_data
 
