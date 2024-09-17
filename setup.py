@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='getTLSInformationToTable',
-    version='1.0.1',
+    version='1.1.0',
     description='Private package to getTLSInformationToTable, a tool to convert Nmap and Censys scans to a table',
     url='git@github.com:JavaliMZ/getTLSInformationToTable.git',
     author='Sylvain Júlio',
